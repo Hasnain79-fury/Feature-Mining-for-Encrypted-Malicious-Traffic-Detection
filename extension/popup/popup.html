@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Traffic Guardian</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo-icon">🛡️</div>
+      <h1 class="header-title">Traffic Guardian</h1>
+    </div>
+    <div class="header-right">
+      <span id="statusDot" class="status-dot offline"></span>
+      <span id="statusText" class="status-text">Checking...</span>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="tabs">
+    <button class="tab active" data-tab="monitor">Monitor</button>
+    <button class="tab" data-tab="sessions">Sessions</button>
+    <button class="tab" data-tab="history">History</button>
+    <button class="tab" data-tab="settings">Settings</button>
+  </nav>
+
+  <!-- Monitor Tab -->
+  <section id="tab-monitor" class="tab-content active">
+    <!-- Shield Status -->
+    <div id="shieldContainer" class="shield-container safe">
+      <div class="shield-icon" id="shieldIcon">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z"/>
+          <path id="shieldCheck" class="shield-check" d="M9 12l2 2 4-4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path id="shieldAlert" class="shield-alert hidden" d="M12 9v3m0 3h.01" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <p class="shield-text" id="shieldText">All traffic looks safe</p>
+      <p class="shield-sub" id="shieldSub">Monitoring encrypted connections</p>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <span class="stat-value" id="activeSessionCount">0</span>
+        <span class="stat-label">Active Sessions</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value" id="totalAnalyzed">0</span>
+        <span class="stat-label">Analyzed</span>
+      </div>
+      <div class="stat-card threat">
+        <span class="stat-value" id="threatDetected">0</span>
+        <span class="stat-label">Threats</span>
+      </div>
+    </div>
+
+    <!-- Active Domains -->
+    <div class="section">
+      <h2 class="section-title">Active Domains</h2>
+      <div id="domainList" class="domain-list">
+        <div class="empty-state">No domains being monitored yet</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sessions Tab (every scanned session, benign + malicious) -->
+  <section id="tab-sessions" class="tab-content">
+    <div class="section-header">
+      <h2 class="section-title">All Scanned Sessions</h2>
+      <button id="clearSessions" class="btn-small">Clear</button>
+    </div>
+    <div id="sessionsList" class="history-list">
+      <div class="empty-state">No sessions scanned yet</div>
+    </div>
+  </section>
+
+  <!-- History Tab -->
+  <section id="tab-history" class="tab-content">
+    <div class="section-header">
+      <h2 class="section-title">Threat History</h2>
+      <button id="clearHistory" class="btn-small">Clear</button>
+    </div>
+    <div id="historyList" class="history-list">
+      <div class="empty-state">No threats detected yet</div>
+    </div>
+  </section>
+
+  <!-- Settings Tab -->
+  <section id="tab-settings" class="tab-content">
+    <div class="settings-group">
+      <label class="setting-label">Backend URL</label>
+      <input type="text" id="backendUrl" class="setting-input" value="http://127.0.0.1:8642">
+    </div>
+    <div class="settings-group">
+      <label class="setting-label">
+        Sensitivity Threshold
+        <span class="setting-value" id="thresholdValue">50%</span>
+      </label>
+      <input type="range" id="threshold" class="setting-slider" min="10" max="90" value="50">
+    </div>
+    <div class="settings-group">
+      <label class="setting-label">
+        <span>Desktop Notifications</span>
+        <label class="toggle">
+          <input type="checkbox" id="notifications" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </label>
+    </div>
+    <div class="settings-group">
+      <label class="setting-label">
+        <span>Auto-analyze</span>
+        <label class="toggle">
+          <input type="checkbox" id="autoAnalyze" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </label>
+    </div>
+    <button id="saveSettings" class="btn-primary">Save Settings</button>
+
+    <div class="settings-group">
+      <label class="setting-label">
+        <span>Send Test Alert</span>
+      </label>
+      <button id="sendTestAlert" class="btn-small" style="width: 100%; padding: 8px;">
+        Simulate a Threat Detection
+      </button>
+      <p class="about-sub" style="margin-top: 6px;">
+        Pushes a fake threat through the badge/notification/history UI so you
+        can see what a detection looks like. Does not call the backend or ML
+        models — not a real prediction.
+      </p>
+    </div>
+
+    <div class="about">
+      <p>Traffic Guardian v1.0.0</p>
+      <p class="about-sub">LSTM + ResNet-34 + XGBoost Ensemble</p>
+    </div>
+  </section>
+
+  <!-- Session Detail Panel (slides in over the tab content on row click) -->
+  <div id="detailPanel" class="detail-panel">
+    <div class="detail-header">
+      <button id="detailBack" class="btn-back">&larr; Back</button>
+      <span class="detail-verdict-pill" id="detailVerdictPill"></span>
+    </div>
+    <div class="detail-body">
+      <h3 class="detail-domain" id="detailDomain"></h3>
+      <div class="detail-meta-grid">
+        <div class="detail-meta-item">
+          <span class="detail-meta-label">Scanned</span>
+          <span class="detail-meta-value" id="detailTime"></span>
+        </div>
+        <div class="detail-meta-item">
+          <span class="detail-meta-label">Packets</span>
+          <span class="detail-meta-value" id="detailPackets"></span>
+        </div>
+        <div class="detail-meta-item">
+          <span class="detail-meta-label">Malicious Prob.</span>
+          <span class="detail-meta-value" id="detailProb"></span>
+        </div>
+        <div class="detail-meta-item">
+          <span class="detail-meta-label">Confidence</span>
+          <span class="detail-meta-value" id="detailConfidence"></span>
+        </div>
+      </div>
+      <h4 class="section-title">Branch Scores</h4>
+      <div id="detailBranches" class="branch-scores visible"></div>
+      <div class="detail-meta-item detail-session-id">
+        <span class="detail-meta-label">Session ID</span>
+        <span class="detail-meta-value" id="detailSessionId"></span>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

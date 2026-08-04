@@ -1,0 +1,60 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="STD1-Session" id="std1">
+    <mxGraphModel dx="800" dy="400" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="800" pageHeight="400">
+      <root>
+        <mxCell id="0"/><mxCell id="1" parent="0"/>
+        <mxCell id="s1" value="Idle" style="ellipse;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="20" y="150" width="80" height="40" as="geometry"/></mxCell>
+        <mxCell id="s2" value="Collecting" style="ellipse;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="160" y="150" width="90" height="40" as="geometry"/></mxCell>
+        <mxCell id="s3" value="Ready" style="ellipse;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1"><mxGeometry x="310" y="150" width="80" height="40" as="geometry"/></mxCell>
+        <mxCell id="s4" value="Analysing" style="ellipse;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1"><mxGeometry x="450" y="150" width="90" height="40" as="geometry"/></mxCell>
+        <mxCell id="s5" value="Verdicted" style="ellipse;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1"><mxGeometry x="600" y="150" width="80" height="40" as="geometry"/></mxCell>
+        <mxCell id="s6" value="Archived" style="ellipse;fillColor=#f5f5f5;strokeColor=#666;strokeWidth=3;" vertex="1" parent="1"><mxGeometry x="730" y="150" width="80" height="40" as="geometry"/></mxCell>
+        <mxCell id="e1" value="new packet" style="fontSize=9;" edge="1" source="s1" target="s2" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e2" value="&lt;15 pkts" style="fontSize=9;curved=1;" edge="1" source="s2" target="s2" parent="1"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="205" y="120"/></Array></mxGeometry></mxCell>
+        <mxCell id="e3" value="≥15 pkts OR idle 30s" style="fontSize=9;" edge="1" source="s2" target="s3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e4" value="POST /predict" style="fontSize=9;" edge="1" source="s3" target="s4" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e5" value="200 response" style="fontSize=9;" edge="1" source="s4" target="s5" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e6" value="timeout" style="fontSize=9;curved=1;" edge="1" source="s4" target="s2" parent="1"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="350" y="60"/><mxPoint x="205" y="60"/></Array></mxGeometry></mxCell>
+        <mxCell id="e7" value="store history" style="fontSize=9;" edge="1" source="s5" target="s6" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="STD2-Backend" id="std2">
+    <mxGraphModel dx="700" dy="350" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="700" pageHeight="350">
+      <root>
+        <mxCell id="0"/><mxCell id="1" parent="0"/>
+        <mxCell id="s1" value="Starting" style="ellipse;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="20" y="120" width="80" height="40" as="geometry"/></mxCell>
+        <mxCell id="s2" value="Loading&#xa;Models" style="ellipse;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1"><mxGeometry x="160" y="120" width="90" height="45" as="geometry"/></mxCell>
+        <mxCell id="s3" value="Ready" style="ellipse;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="310" y="120" width="80" height="40" as="geometry"/></mxCell>
+        <mxCell id="s4" value="Processing" style="ellipse;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1"><mxGeometry x="460" y="120" width="90" height="40" as="geometry"/></mxCell>
+        <mxCell id="s5" value="Error" style="ellipse;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1"><mxGeometry x="310" y="30" width="80" height="40" as="geometry"/></mxCell>
+        <mxCell id="e1" value="uvicorn init" style="fontSize=9;" edge="1" source="s1" target="s2" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e2" value="all loaded" style="fontSize=9;" edge="1" source="s2" target="s3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e3" value="POST /predict" style="fontSize=9;" edge="1" source="s3" target="s4" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e4" value="done" style="fontSize=9;" edge="1" source="s4" target="s3" parent="1"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="400" y="230"/></Array></mxGeometry></mxCell>
+        <mxCell id="e5" value="file missing" style="fontSize=9;" edge="1" source="s2" target="s5" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e6" value="exception" style="fontSize=9;" edge="1" source="s4" target="s5" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e7" value="restart" style="fontSize=9;" edge="1" source="s5" target="s1" parent="1"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="60" y="50"/></Array></mxGeometry></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="STD3-Extension" id="std3">
+    <mxGraphModel dx="700" dy="350" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="700" pageHeight="350">
+      <root>
+        <mxCell id="0"/><mxCell id="1" parent="0"/>
+        <mxCell id="s1" value="Installed" style="ellipse;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="20" y="130" width="80" height="40" as="geometry"/></mxCell>
+        <mxCell id="s2" value="Connecting" style="ellipse;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1"><mxGeometry x="160" y="130" width="90" height="40" as="geometry"/></mxCell>
+        <mxCell id="s3" value="Monitoring" style="ellipse;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="310" y="130" width="90" height="40" as="geometry"/></mxCell>
+        <mxCell id="s4" value="Threat Alert" style="ellipse;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1"><mxGeometry x="470" y="130" width="90" height="40" as="geometry"/></mxCell>
+        <mxCell id="s5" value="Offline" style="ellipse;fillColor=#f5f5f5;strokeColor=#666;" vertex="1" parent="1"><mxGeometry x="240" y="40" width="80" height="40" as="geometry"/></mxCell>
+        <mxCell id="e1" value="/health" style="fontSize=9;" edge="1" source="s1" target="s2" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e2" value="200 OK" style="fontSize=9;" edge="1" source="s2" target="s3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e3" value="timeout" style="fontSize=9;" edge="1" source="s2" target="s5" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e4" value="malicious" style="fontSize=9;" edge="1" source="s3" target="s4" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e5" value="notified" style="fontSize=9;" edge="1" source="s4" target="s3" parent="1"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="430" y="230"/></Array></mxGeometry></mxCell>
+        <mxCell id="e6" value="retry 30s" style="fontSize=9;" edge="1" source="s5" target="s2" parent="1"><mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="140" y="60"/></Array></mxGeometry></mxCell>
+        <mxCell id="e7" value="backend down" style="fontSize=9;" edge="1" source="s3" target="s5" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

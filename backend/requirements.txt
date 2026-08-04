@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+tensorflow
+torch
+torchvision
+xgboost==2.0.3
+scikit-learn
+joblib
+numpy
+pydantic
+dill

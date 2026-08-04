@@ -1,0 +1,35 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Component-Diagram" id="comp">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="900">
+      <root>
+        <mxCell id="0"/><mxCell id="1" parent="0"/>
+        <!-- Chrome Extension Package -->
+        <mxCell id="p1" value="&lt;&lt;browser&gt;&gt; Chrome Extension" style="shape=rect;rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;fontStyle=1;verticalAlign=top;spacingTop=6;" vertex="1" parent="1"><mxGeometry x="30" y="30" width="520" height="300" as="geometry"/></mxCell>
+        <mxCell id="c1" value="content.js&#xa;Resource Timing API" style="shape=component;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="1"><mxGeometry x="50" y="70" width="140" height="50" as="geometry"/></mxCell>
+        <mxCell id="c2" value="background.js&#xa;Service Worker" style="shape=component;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="1"><mxGeometry x="230" y="70" width="140" height="50" as="geometry"/></mxCell>
+        <mxCell id="c3" value="SessionManager" style="shape=component;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="1"><mxGeometry x="50" y="160" width="140" height="40" as="geometry"/></mxCell>
+        <mxCell id="c4" value="FeatureEngineer" style="shape=component;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="1"><mxGeometry x="230" y="160" width="140" height="40" as="geometry"/></mxCell>
+        <mxCell id="c5" value="popup/&#xa;popup.html + popup.js + popup.css" style="shape=component;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1"><mxGeometry x="120" y="240" width="250" height="50" as="geometry"/></mxCell>
+        <mxCell id="cm1" value="message" style="endArrow=block;endFill=1;fontSize=9;" edge="1" source="c1" target="c2" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="cm2" edge="1" source="c2" target="c3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="cm3" edge="1" source="c3" target="c4" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <!-- Backend Package -->
+        <mxCell id="p2" value="&lt;&lt;server&gt;&gt; FastAPI Backend (127.0.0.1:8642)" style="shape=rect;rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;fontStyle=1;verticalAlign=top;spacingTop=6;" vertex="1" parent="1"><mxGeometry x="30" y="400" width="520" height="160" as="geometry"/></mxCell>
+        <mxCell id="b1" value="app.py&#xa;(Routes)" style="shape=component;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="1"><mxGeometry x="50" y="440" width="120" height="50" as="geometry"/></mxCell>
+        <mxCell id="b2" value="feature_transform.py" style="shape=component;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="1"><mxGeometry x="200" y="440" width="140" height="50" as="geometry"/></mxCell>
+        <mxCell id="b3" value="inference.py&#xa;EnsemblePredictor" style="shape=component;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="1"><mxGeometry x="370" y="440" width="150" height="50" as="geometry"/></mxCell>
+        <mxCell id="bm1" edge="1" source="b1" target="b2" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="bm2" edge="1" source="b2" target="b3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <!-- Models Package -->
+        <mxCell id="p3" value="models/" style="shape=rect;rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=13;fontStyle=1;verticalAlign=top;spacingTop=6;" vertex="1" parent="1"><mxGeometry x="620" y="400" width="340" height="160" as="geometry"/></mxCell>
+        <mxCell id="m1" value="lstm_model.h5" style="shape=note;whiteSpace=wrap;html=1;fontSize=10;fillColor=#f5f5f5;strokeColor=#666;" vertex="1" parent="1"><mxGeometry x="640" y="440" width="110" height="30" as="geometry"/></mxCell>
+        <mxCell id="m2" value="resnet34.pt" style="shape=note;whiteSpace=wrap;html=1;fontSize=10;fillColor=#f5f5f5;strokeColor=#666;" vertex="1" parent="1"><mxGeometry x="640" y="480" width="110" height="30" as="geometry"/></mxCell>
+        <mxCell id="m3" value="xgb_model.pkl" style="shape=note;whiteSpace=wrap;html=1;fontSize=10;fillColor=#f5f5f5;strokeColor=#666;" vertex="1" parent="1"><mxGeometry x="780" y="440" width="110" height="30" as="geometry"/></mxCell>
+        <mxCell id="m4" value="rf_layer2.pkl" style="shape=note;whiteSpace=wrap;html=1;fontSize=10;fillColor=#f5f5f5;strokeColor=#666;" vertex="1" parent="1"><mxGeometry x="780" y="480" width="110" height="30" as="geometry"/></mxCell>
+        <!-- Inter-package connections -->
+        <mxCell id="http" value="HTTP POST /predict" style="endArrow=block;endFill=1;fontSize=10;strokeWidth=2;strokeColor=#b85450;" edge="1" source="p1" target="p2" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="load" value="loads" style="endArrow=open;dashed=1;fontSize=10;" edge="1" source="b3" target="p3" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

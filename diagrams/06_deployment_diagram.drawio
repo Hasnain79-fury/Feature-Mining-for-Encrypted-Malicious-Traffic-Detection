@@ -1,0 +1,27 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Deployment-Diagram" id="dep">
+    <mxGraphModel dx="1100" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="700">
+      <root>
+        <mxCell id="0"/><mxCell id="1" parent="0"/>
+        <!-- Device -->
+        <mxCell id="d1" value="&lt;&lt;device&gt;&gt;&#xa;User's Windows PC" style="shape=rect;rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=13;fontStyle=1;verticalAlign=top;spacingTop=6;strokeWidth=2;" vertex="1" parent="1"><mxGeometry x="50" y="30" width="1000" height="620" as="geometry"/></mxCell>
+        <!-- Browser -->
+        <mxCell id="b1" value="&lt;&lt;browser&gt;&gt; Google Chrome 120+" style="shape=rect;rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;fontStyle=1;verticalAlign=top;spacingTop=6;" vertex="1" parent="1"><mxGeometry x="80" y="80" width="420" height="300" as="geometry"/></mxCell>
+        <mxCell id="ext" value="&lt;&lt;extension&gt;&gt;&#xa;Traffic Guardian (Manifest V3)" style="shape=rect;rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;fontStyle=1;verticalAlign=top;spacingTop=6;" vertex="1" parent="1"><mxGeometry x="110" y="130" width="360" height="220" as="geometry"/></mxCell>
+        <mxCell id="sw" value="Service Worker&#xa;background.js" style="shape=rect;rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="1"><mxGeometry x="130" y="180" width="140" height="45" as="geometry"/></mxCell>
+        <mxCell id="cs" value="Content Script&#xa;content.js" style="shape=rect;rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="1"><mxGeometry x="300" y="180" width="140" height="45" as="geometry"/></mxCell>
+        <mxCell id="pu" value="Popup UI&#xa;popup.html / js / css" style="shape=rect;rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1"><mxGeometry x="200" y="260" width="170" height="45" as="geometry"/></mxCell>
+        <!-- Backend Server -->
+        <mxCell id="sv" value="&lt;&lt;server&gt;&gt; Local Python Backend" style="shape=rect;rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;fontStyle=1;verticalAlign=top;spacingTop=6;" vertex="1" parent="1"><mxGeometry x="570" y="80" width="440" height="540" as="geometry"/></mxCell>
+        <mxCell id="rt" value="&lt;&lt;runtime&gt;&gt; Python 3.8+" style="shape=rect;rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666;fontSize=10;" vertex="1" parent="1"><mxGeometry x="600" y="130" width="180" height="35" as="geometry"/></mxCell>
+        <mxCell id="fw" value="&lt;&lt;framework&gt;&gt;&#xa;FastAPI + Uvicorn&#xa;127.0.0.1:8642" style="shape=rect;rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="1"><mxGeometry x="600" y="185" width="180" height="55" as="geometry"/></mxCell>
+        <mxCell id="ml1" value="&lt;&lt;model&gt;&gt; TensorFlow 2.x&#xa;LSTM (lstm_model.h5)" style="shape=rect;rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" vertex="1" parent="1"><mxGeometry x="600" y="280" width="180" height="45" as="geometry"/></mxCell>
+        <mxCell id="ml2" value="&lt;&lt;model&gt;&gt; PyTorch 2.x&#xa;ResNet-34 (resnet34.pt)" style="shape=rect;rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" vertex="1" parent="1"><mxGeometry x="600" y="345" width="180" height="45" as="geometry"/></mxCell>
+        <mxCell id="ml3" value="&lt;&lt;model&gt;&gt; XGBoost&#xa;XGBClassifier (xgb_model.pkl)" style="shape=rect;rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" vertex="1" parent="1"><mxGeometry x="600" y="410" width="200" height="45" as="geometry"/></mxCell>
+        <mxCell id="ml4" value="&lt;&lt;model&gt;&gt; scikit-learn&#xa;RF Ensemble (rf_layer2.pkl)" style="shape=rect;rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" vertex="1" parent="1"><mxGeometry x="600" y="475" width="200" height="45" as="geometry"/></mxCell>
+        <!-- Connection -->
+        <mxCell id="conn" value="HTTP localhost:8642" style="endArrow=block;endFill=1;strokeWidth=2;strokeColor=#b85450;fontSize=10;" edge="1" source="b1" target="sv" parent="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

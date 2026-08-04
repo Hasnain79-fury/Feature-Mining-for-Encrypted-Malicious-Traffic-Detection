@@ -1,0 +1,33 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# --- Large raw datasets (regenerate/download separately, too big for GitHub) ---
+/packet_based_dataset.csv
+/session_based_dataset.csv
+/Test Set/
+/Train Set/
+
+# --- Trained model weights / checkpoints ---
+best.pt
+last.pt
+/models/
+/probs/
+/scalers/
+/tensors/
+
+# --- Misc generated ---
+*.log
