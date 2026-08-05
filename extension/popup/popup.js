@@ -264,6 +264,109 @@ document.getElementById('clearSessions').addEventListener('click', async () => {
   renderSessions([]);
 });
 
+// ── PCAP Upload ──
+// Runs directly in the popup (not relayed through background.js messaging,
+// which has payload size limits unsuitable for a multi-MB pcap file).
+const DEFAULT_BACKEND_URL = 'http://127.0.0.1:8642';
+
+function getBackendUrl() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get('backendUrl', (data) => {
+      resolve(data.backendUrl || DEFAULT_BACKEND_URL);
+    });
+  });
+}
+
+function setUploadStatus(text, kind) {
+  const el = document.getElementById('uploadStatus');
+  el.textContent = text;
+  el.className = `upload-status ${kind || ''}`;
+  el.classList.remove('hidden');
+}
+
+document.getElementById('uploadPcapBtn').addEventListener('click', () => {
+  document.getElementById('pcapFileInput').click();
+});
+
+document.getElementById('pcapFileInput').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  e.target.value = ''; // allow re-selecting the same file later
+  if (!file) return;
+
+  const btn = document.getElementById('uploadPcapBtn');
+  btn.disabled = true;
+  btn.textContent = 'Analyzing…';
+  setUploadStatus(`Analyzing ${file.name}…`, '');
+
+  try {
+    const backendUrl = await getBackendUrl();
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const res = await fetch(`${backendUrl}/predict_pcap`, { method: 'POST', body: formData });
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.detail || `Backend returned ${res.status}`);
+    }
+
+    await importPcapFlows(data.flows);
+
+    const maliciousCount = data.flows.filter(f => f.verdict === 'malicious').length;
+    setUploadStatus(
+      `Analyzed ${data.flows_analyzed} of ${data.flows_found} flow(s) — ` +
+      `${maliciousCount} malicious, ${data.flows_analyzed - maliciousCount} benign.`,
+      maliciousCount > 0 ? 'error' : 'success'
+    );
+
+    if (maliciousCount > 0) {
+      await sendMessage({ type: 'PCAP_IMPORTED', maliciousCount });
+    }
+
+    await loadSessions();
+    await refresh();
+  } catch (err) {
+    setUploadStatus(`Upload failed: ${err.message}`, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '📁 Upload PCAP';
+  }
+});
+
+// Write each analyzed flow into the same storage shape background.js uses
+// for live-captured sessions, so they render through the existing list +
+// detail panel with no extra rendering code.
+function importPcapFlows(flows) {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['sessionLog', 'threatLog'], (data) => {
+      const sessionLog = data.sessionLog || [];
+      const threatLog = data.threatLog || [];
+      const now = Date.now();
+
+      for (const f of flows) {
+        if (f.verdict === 'error') continue; // skip flows the transform failed on
+        const entry = {
+          sessionId: f.flow_id,
+          domain: `${f.label} (pcap)`,
+          packetCount: f.packet_count,
+          verdict: f.verdict,
+          confidence: f.confidence,
+          malicious_prob: f.malicious_prob,
+          branches: f.branches,
+          timestamp: now,
+        };
+        sessionLog.unshift(entry);
+        if (f.verdict === 'malicious') threatLog.unshift(entry);
+      }
+
+      chrome.storage.local.set({
+        sessionLog: sessionLog.slice(0, 300),
+        threatLog: threatLog.slice(0, 200),
+      }, resolve);
+    });
+  });
+}
+
 // ── Session Detail Panel ──
 function openDetailPanel(item) {
   const pill = document.getElementById('detailVerdictPill');

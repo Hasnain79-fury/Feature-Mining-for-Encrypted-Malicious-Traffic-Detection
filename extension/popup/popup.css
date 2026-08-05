@@ -669,6 +669,46 @@ body::-webkit-scrollbar-thumb {
   opacity: 0.6;
 }
 
+/* ── PCAP Upload ── */
+
+.upload-row {
+  margin-bottom: 16px;
+}
+
+.btn-upload {
+  width: 100%;
+}
+
+.btn-upload:disabled {
+  opacity: 0.6;
+  cursor: default;
+  transform: none;
+  box-shadow: none;
+}
+
+.upload-status {
+  margin-top: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 500;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  color: var(--text-secondary);
+}
+
+.upload-status.error {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: var(--accent-danger);
+}
+
+.upload-status.success {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: var(--accent-safe);
+}
+
 /* ── Session Detail Panel ── */
 
 .detail-panel {

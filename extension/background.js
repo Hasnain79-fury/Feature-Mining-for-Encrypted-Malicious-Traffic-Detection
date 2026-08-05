@@ -87,6 +87,16 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     sendResponse({ ok: true });
     return true;
   }
+
+  if (msg.type === 'PCAP_IMPORTED') {
+    // popup.js already wrote the flow results into storage directly (a
+    // pcap can be multi-MB, too large for the messaging channel) — this
+    // just bumps the in-memory threat count and badge to match.
+    threatCount += msg.maliciousCount || 0;
+    updateBadge('threat');
+    sendResponse({ ok: true });
+    return true;
+  }
 });
 
 // ── UI demo helper: simulates a threat through the real badge/notification/

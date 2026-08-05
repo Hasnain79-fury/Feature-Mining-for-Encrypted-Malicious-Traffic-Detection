@@ -137,3 +137,49 @@ class EnsemblePredictor:
                 "xgboost": round(float(p_xgb[1]), 4),
             }
         }
+
+    def predict_pcap_flow(self, flow: dict) -> dict:
+        """
+        Run the full 3-branch ensemble on a flow extracted from a real
+        packet capture (see pcap_transform.extract_flows). Same result
+        shape as predict(), using the higher-fidelity transform_pcap() path
+        (real TTL/TCP-window/header data instead of browser approximations).
+        """
+        try:
+            X_lstm, X_resnet, X_xgb = self.transformer.transform_pcap(flow)
+        except Exception as e:
+            return {"verdict": "error", "error": f"PCAP feature transform failed: {e}"}
+
+        if X_lstm.shape[2] != self.lstm_input_features:
+            if X_lstm.shape[2] > self.lstm_input_features:
+                X_lstm = X_lstm[:, :, :self.lstm_input_features]
+            else:
+                pad = np.zeros((1, 15, self.lstm_input_features - X_lstm.shape[2]),
+                               dtype=np.float32)
+                X_lstm = np.concatenate([X_lstm, pad], axis=2)
+
+        p_lstm = self.lstm.predict(X_lstm, verbose=0)[0]
+
+        torch, _, _ = _import_torch()
+        with torch.no_grad():
+            t_input = torch.from_numpy(X_resnet).float().to(self.device)
+            logits = self.resnet(t_input)
+            p_resnet = torch.softmax(logits, dim=1).cpu().numpy()[0]
+
+        p_xgb = self.xgb.predict_proba(X_xgb)[0]
+
+        meta = np.hstack([p_lstm, p_resnet, p_xgb]).reshape(1, -1)
+        p_final = self.rf.predict_proba(meta)[0]
+
+        verdict = "malicious" if p_final[1] > 0.5 else "benign"
+
+        return {
+            "verdict": verdict,
+            "confidence": round(float(max(p_final)), 4),
+            "malicious_prob": round(float(p_final[1]), 4),
+            "branches": {
+                "lstm":    round(float(p_lstm[1]), 4),
+                "resnet":  round(float(p_resnet[1]), 4),
+                "xgboost": round(float(p_xgb[1]), 4),
+            },
+        }

@@ -674,7 +674,20 @@ classification — these are future-work, not blockers.
 4. **CORS uses `allow_credentials=False`** — the extension doesn't send
    cookies/auth headers, and pairing a wildcard origin with credentials is
    an invalid CORS configuration anyway.
-5. **Fixed a critical timestamp-precision bug found during end-to-end
+5. **Added PCAP upload as a second input path** (`backend/pcap_transform.py`,
+   `FeatureTransformer.transform_pcap()`, `POST /predict_pcap`, and an
+   "Upload PCAP" button in the extension's Sessions tab). A raw capture
+   exposes real TTL, real TCP window size, real IP/TCP header lengths, and
+   the true forward/backward packet split — none of which a browser
+   extension can ever see. Since ~42% of the XGBoost model's feature
+   importance sits on exactly those fields (permanently median-filled on
+   the browser path — see point 6 below and `_build_xgb`'s docstring), this
+   is a real accuracy upgrade, not just an alternate input format. Verified
+   end-to-end with a synthetic pcap (crafted TCP handshake + TLS
+   ClientHello with SNI + beacon-like data packets): flow extraction, SNI
+   parsing, and prediction all confirmed working via both a direct Python
+   call and a live `curl` against `/predict_pcap`.
+6. **Fixed a critical timestamp-precision bug found during end-to-end
    testing.** `FeatureTransformer.transform()` cast raw millisecond-epoch
    timestamps (`Date.now()`-scale, ~1.7e12) straight to `float32`. Float32
    only carries ~7 significant digits, so at that magnitude it cannot

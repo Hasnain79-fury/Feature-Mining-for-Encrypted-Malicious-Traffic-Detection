@@ -7,10 +7,13 @@ Run: python -m uvicorn app:app --host 127.0.0.1 --port 8642
 
 import os
 from pathlib import Path
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
+
+MAX_PCAP_BYTES = 50 * 1024 * 1024  # 50MB upload cap
+MAX_FLOWS_PER_REQUEST = 100  # bound worst-case request latency
 
 # Resolve project root (parent of backend/) — works regardless of clone location
 PROJECT_ROOT = str(Path(__file__).resolve().parent.parent)
@@ -107,6 +110,51 @@ async def predict(payload: SessionPayload):
 
     result = predictor.predict(session_dict)
     return result
+
+
+@app.post("/predict_pcap")
+async def predict_pcap(file: UploadFile = File(...)):
+    """
+    Run ensemble prediction on every TCP flow found in an uploaded
+    .pcap/.pcapng file. Uses the higher-fidelity pcap feature path (real
+    TTL/TCP-window/header data) — see feature_transform.py::transform_pcap.
+    """
+    if predictor is None:
+        raise HTTPException(status_code=503, detail="Models not loaded")
+
+    filename = file.filename or ""
+    if not filename.lower().endswith(('.pcap', '.pcapng', '.cap')):
+        raise HTTPException(status_code=400, detail="File must be .pcap, .pcapng, or .cap")
+
+    contents = await file.read()
+    if len(contents) > MAX_PCAP_BYTES:
+        raise HTTPException(status_code=413, detail=f"File exceeds {MAX_PCAP_BYTES // (1024*1024)}MB limit")
+    if len(contents) == 0:
+        raise HTTPException(status_code=400, detail="Empty file")
+
+    try:
+        from pcap_transform import extract_flows
+        flows = extract_flows(contents)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except RuntimeError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+    analyzed = []
+    for flow in flows[:MAX_FLOWS_PER_REQUEST]:
+        result = predictor.predict_pcap_flow(flow)
+        analyzed.append({
+            "flow_id": flow["flow_id"],
+            "label": flow["label"],
+            "packet_count": flow["packet_count"],
+            **result,
+        })
+
+    return {
+        "flows_found": len(flows),
+        "flows_analyzed": len(analyzed),
+        "flows": analyzed,
+    }
 
 
 @app.get("/")

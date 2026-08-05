@@ -71,6 +71,14 @@
 
   <!-- Sessions Tab (every scanned session, benign + malicious) -->
   <section id="tab-sessions" class="tab-content">
+    <div class="upload-row">
+      <input type="file" id="pcapFileInput" accept=".pcap,.pcapng,.cap" class="hidden">
+      <button id="uploadPcapBtn" class="btn-primary btn-upload">
+        &#128193; Upload PCAP
+      </button>
+      <div id="uploadStatus" class="upload-status hidden"></div>
+    </div>
+
     <div class="section-header">
       <h2 class="section-title">All Scanned Sessions</h2>
       <button id="clearSessions" class="btn-small">Clear</button>
