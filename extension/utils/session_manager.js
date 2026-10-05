@@ -135,10 +135,11 @@ export class SessionManager {
     };
 
     try {
-      const result = await this.onFlush(payload);
-      if (result && result.verdict) {
-        this.verdicts.set(session.domain, result);
-      }
+      // onFlush (handleVerdict in background.js) already writes the
+      // complete verdict object — including timestamp/domain/whitelisted —
+      // into this.verdicts itself. Don't overwrite it here with the bare
+      // result, which lacks those fields.
+      await this.onFlush(payload);
     } catch (err) {
       console.warn('[TrafficGuardian] Flush failed:', err.message);
     }

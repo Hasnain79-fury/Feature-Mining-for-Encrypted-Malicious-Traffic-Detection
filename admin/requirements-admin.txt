@@ -1,0 +1,20 @@
+# Own manifest for the admin explainability module — kept separate from
+# backend/requirements.txt so the live backend's dependency set (which the
+# extension depends on) never changes because of this module.
+#
+# Installed into the same project .venv as backend/requirements.txt in
+# practice (avoids re-downloading multi-GB ML frameworks into a second
+# venv) — process isolation, not venv isolation, is what actually protects
+# the live backend here (see admin/app.py's module docstring).
+fastapi
+uvicorn[standard]
+tensorflow
+torch
+torchvision
+xgboost==2.0.3
+scikit-learn
+joblib
+numpy
+scapy
+python-multipart
+shap

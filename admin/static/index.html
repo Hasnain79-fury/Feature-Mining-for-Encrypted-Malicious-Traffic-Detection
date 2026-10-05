@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Traffic Guardian — Admin Explainability</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/admin.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header-left">
+      <div class="logo-icon">&#128269;</div>
+      <div>
+        <h1 class="header-title">Traffic Guardian — Admin</h1>
+        <p class="header-sub">SHAP Explainability (Level 1) &middot; XGBoost + Layer-2 Random Forest</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <span id="statusDot" class="status-dot offline"></span>
+      <span id="statusText" class="status-text">Checking...</span>
+    </div>
+  </header>
+
+  <main class="main">
+    <section class="panel upload-panel">
+      <h2 class="panel-title">1. Upload a PCAP</h2>
+      <p class="panel-sub">
+        Standalone from the live extension/backend — this reads its own copy of the
+        trained models and never touches <code>/predict</code> or extension state.
+      </p>
+      <div class="upload-row">
+        <input type="file" id="pcapFileInput" accept=".pcap,.pcapng,.cap" class="hidden">
+        <button id="uploadBtn" class="btn-primary">&#128193; Upload &amp; List Flows</button>
+        <span id="uploadStatus" class="upload-status"></span>
+      </div>
+    </section>
+
+    <section class="panel flows-panel hidden" id="flowsPanel">
+      <h2 class="panel-title">2. Pick a Flow to Explain</h2>
+      <div id="flowsList" class="flows-list"></div>
+    </section>
+
+    <section class="panel explain-panel hidden" id="explainPanel">
+      <h2 class="panel-title">3. SHAP Explanation</h2>
+      <div id="explainSummary" class="explain-summary"></div>
+
+      <div class="explain-grid">
+        <div class="explain-col">
+          <h3 class="explain-col-title">XGBoost <span class="units-tag">log-odds units</span></h3>
+          <p class="explain-col-note">
+            Positive = pushed this flow toward malicious. Negative = pushed toward benign.
+            Values don't sum to a 0–1 probability (raw model margin, not predict_proba).
+          </p>
+          <div class="explain-block">
+            <h4 class="explain-block-title toward-malicious">Top features → malicious</h4>
+            <div id="xgbMalicious" class="contrib-list"></div>
+          </div>
+          <div class="explain-block">
+            <h4 class="explain-block-title toward-benign">Top features → benign</h4>
+            <div id="xgbBenign" class="contrib-list"></div>
+          </div>
+        </div>
+
+        <div class="explain-col">
+          <h3 class="explain-col-title">Layer-2 Random Forest <span class="units-tag">probability units</span></h3>
+          <p class="explain-col-note">
+            How much each branch's own probability drove the final ensemble decision.
+            These values are true probability contributions (base value + sum ≈ malicious probability).
+          </p>
+          <div class="explain-block">
+            <h4 class="explain-block-title toward-malicious">Branches pushing → malicious</h4>
+            <div id="rfMalicious" class="contrib-list"></div>
+          </div>
+          <div class="explain-block">
+            <h4 class="explain-block-title toward-benign">Branches pushing → benign</h4>
+            <div id="rfBenign" class="contrib-list"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/admin.js"></script>
+</body>
+</html>

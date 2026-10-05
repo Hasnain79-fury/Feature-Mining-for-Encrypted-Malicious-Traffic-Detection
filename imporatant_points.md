@@ -1,0 +1,3 @@
+Not feasible — worth naming so it's not assumed to be "just more work"
+
+Having the extension capture raw packets itself (to skip manual pcap upload) — a browser extension has no NIC/raw-socket access; this is a hard sandbox boundary, not a missing feature. It's exactly why the pcap-upload path exists as a separate, more accurate input method. The closest feasible approximation is watching chrome.downloads for a new .pcap file and prompting the user to open the upload dialog — but the extension still can't silently read local files without the user picking them via the file input.

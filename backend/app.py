@@ -157,6 +157,36 @@ async def predict_pcap(file: UploadFile = File(...)):
     }
 
 
+@app.post("/identify_hosts")
+async def identify_hosts_endpoint(file: UploadFile = File(...)):
+    """
+    Best-effort host identification (MAC/hostname/username) from a pcap —
+    a separate, complementary capability from the ML classifier. Uses
+    ARP/DHCP/NTLM parsing, not traffic statistics. See host_identify.py's
+    module docstring for what it can and can't answer (e.g. never a full
+    name — that's not generally a network-traffic artifact).
+    """
+    filename = file.filename or ""
+    if not filename.lower().endswith(('.pcap', '.pcapng', '.cap')):
+        raise HTTPException(status_code=400, detail="File must be .pcap, .pcapng, or .cap")
+
+    contents = await file.read()
+    if len(contents) > MAX_PCAP_BYTES:
+        raise HTTPException(status_code=413, detail=f"File exceeds {MAX_PCAP_BYTES // (1024*1024)}MB limit")
+    if len(contents) == 0:
+        raise HTTPException(status_code=400, detail="Empty file")
+
+    try:
+        from host_identify import identify_hosts
+        hosts = identify_hosts(contents)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except RuntimeError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+    return {"hosts": hosts}
+
+
 @app.get("/")
 async def root():
     return {

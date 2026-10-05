@@ -81,7 +81,18 @@
 
     <div class="section-header">
       <h2 class="section-title">All Scanned Sessions</h2>
-      <button id="clearSessions" class="btn-small">Clear</button>
+      <div class="header-actions">
+        <button id="exportSessions" class="btn-small">Export</button>
+        <button id="clearSessions" class="btn-small">Clear</button>
+      </div>
+    </div>
+    <div class="filter-row">
+      <input type="text" id="sessionsSearch" class="filter-search" placeholder="Search domain…">
+      <div class="filter-toggle" id="sessionsFilterToggle">
+        <button class="filter-pill active" data-filter="all">All</button>
+        <button class="filter-pill" data-filter="malicious">Malicious</button>
+        <button class="filter-pill" data-filter="benign">Benign</button>
+      </div>
     </div>
     <div id="sessionsList" class="history-list">
       <div class="empty-state">No sessions scanned yet</div>
@@ -92,7 +103,13 @@
   <section id="tab-history" class="tab-content">
     <div class="section-header">
       <h2 class="section-title">Threat History</h2>
-      <button id="clearHistory" class="btn-small">Clear</button>
+      <div class="header-actions">
+        <button id="exportHistory" class="btn-small">Export</button>
+        <button id="clearHistory" class="btn-small">Clear</button>
+      </div>
+    </div>
+    <div class="filter-row">
+      <input type="text" id="historySearch" class="filter-search" placeholder="Search domain…">
     </div>
     <div id="historyList" class="history-list">
       <div class="empty-state">No threats detected yet</div>
@@ -111,6 +128,24 @@
         <span class="setting-value" id="thresholdValue">50%</span>
       </label>
       <input type="range" id="threshold" class="setting-slider" min="10" max="90" value="50">
+      <p class="about-sub" style="margin-top: 6px;">
+        Sessions at or above this malicious-probability cutoff are flagged.
+        Lower it to catch more, raise it to reduce false positives. Applies
+        going forward only — past sessions keep the verdict they were
+        recorded with.
+      </p>
+    </div>
+    <div class="settings-group">
+      <label class="setting-label">
+        <span>Whitelisted Domains</span>
+      </label>
+      <div id="whitelistList" class="whitelist-list">
+        <div class="empty-state">No domains whitelisted</div>
+      </div>
+      <p class="about-sub" style="margin-top: 6px;">
+        Whitelisted domains still get scanned and logged, but won't raise a
+        badge/notification alert even if flagged malicious.
+      </p>
     </div>
     <div class="settings-group">
       <label class="setting-label">
@@ -173,16 +208,62 @@
           <span class="detail-meta-label">Malicious Prob.</span>
           <span class="detail-meta-value" id="detailProb"></span>
         </div>
-        <div class="detail-meta-item">
-          <span class="detail-meta-label">Confidence</span>
+        <div class="detail-meta-item clickable-meta" id="detailConfidenceItem" title="Click to see how this is calculated">
+          <span class="detail-meta-label">Confidence <span class="info-hint">&#9432;</span></span>
           <span class="detail-meta-value" id="detailConfidence"></span>
         </div>
       </div>
+
+      <div id="confidenceExplain" class="confidence-explain hidden">
+        <p class="confidence-explain-title">How this is calculated</p>
+        <p class="confidence-explain-text">
+          Confidence is <strong>max(malicious %, benign %)</strong> from the
+          Layer-2 Random Forest — how sure the model is of its own decision,
+          not the malicious probability itself. It's computed by combining
+          the three branch scores below through a 200-tree ensemble.
+        </p>
+        <div class="confidence-explain-row">
+          <span>Malicious probability</span>
+          <span id="confidenceExplainMal"></span>
+        </div>
+        <div class="confidence-explain-row">
+          <span>Benign probability</span>
+          <span id="confidenceExplainBenign"></span>
+        </div>
+      </div>
+
       <h4 class="section-title">Branch Scores</h4>
       <div id="detailBranches" class="branch-scores visible"></div>
       <div class="detail-meta-item detail-session-id">
         <span class="detail-meta-label">Session ID</span>
         <span class="detail-meta-value" id="detailSessionId"></span>
+      </div>
+
+      <button id="detailMarkSafe" class="btn-small detail-mark-safe hidden">
+        Mark domain as safe (mute future alerts)
+      </button>
+
+      <div id="detailHostSection" class="detail-host-section hidden">
+        <h4 class="section-title">Infected Host (best-effort, from pcap)</h4>
+        <div class="detail-meta-grid">
+          <div class="detail-meta-item">
+            <span class="detail-meta-label">IP Address</span>
+            <span class="detail-meta-value" id="detailHostIp"></span>
+          </div>
+          <div class="detail-meta-item">
+            <span class="detail-meta-label">MAC Address</span>
+            <span class="detail-meta-value" id="detailHostMac"></span>
+          </div>
+          <div class="detail-meta-item">
+            <span class="detail-meta-label">Hostname</span>
+            <span class="detail-meta-value" id="detailHostName"></span>
+          </div>
+          <div class="detail-meta-item">
+            <span class="detail-meta-label">Username</span>
+            <span class="detail-meta-value" id="detailHostUser"></span>
+          </div>
+        </div>
+        <p class="about-sub detail-host-note" id="detailHostNote"></p>
       </div>
     </div>
   </div>

@@ -315,6 +315,70 @@ body::-webkit-scrollbar-thumb {
   margin-bottom: 0;
 }
 
+.header-actions {
+  display: flex;
+  gap: 6px;
+}
+
+/* ── Search + Filter Row ── */
+
+.filter-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.filter-search {
+  width: 100%;
+  padding: 7px 12px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font);
+  font-size: 12px;
+  outline: none;
+  transition: var(--transition);
+}
+
+.filter-search:focus {
+  border-color: var(--accent-info);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+.filter-toggle {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+}
+
+.filter-pill {
+  flex: 1;
+  padding: 5px 0;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-family: var(--font);
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.filter-pill:hover {
+  color: var(--text-secondary);
+}
+
+.filter-pill.active {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
 /* ── Domain List ── */
 
 .domain-list {
@@ -397,6 +461,36 @@ body::-webkit-scrollbar-thumb {
   background: rgba(100, 116, 139, 0.15);
   color: var(--text-muted);
   border: 1px solid var(--border-glass);
+}
+
+/* Severity bands — graded by malicious_prob, independent of the alert
+   threshold (which only decides whether an alert fires, not how bad it is). */
+.verdict-pill.low,
+.detail-verdict-pill.low {
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--accent-warn);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.verdict-pill.medium,
+.detail-verdict-pill.medium {
+  background: rgba(249, 115, 22, 0.15);
+  color: #f97316;
+  border: 1px solid rgba(249, 115, 22, 0.35);
+}
+
+.verdict-pill.high,
+.detail-verdict-pill.high {
+  background: rgba(239, 68, 68, 0.18);
+  color: var(--accent-danger);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.verdict-pill.whitelisted,
+.detail-verdict-pill.whitelisted {
+  background: rgba(139, 92, 246, 0.12);
+  color: var(--accent-purple);
+  border: 1px solid rgba(139, 92, 246, 0.3);
 }
 
 /* ── Branch Scores (expandable) ── */
@@ -609,6 +703,50 @@ body::-webkit-scrollbar-thumb {
   transform: translateX(16px);
 }
 
+/* ── Whitelist Manager ── */
+
+.whitelist-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.whitelist-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-sm);
+}
+
+.whitelist-domain {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.whitelist-remove {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+  transition: var(--transition);
+}
+
+.whitelist-remove:hover {
+  color: var(--accent-danger);
+}
+
 /* Buttons */
 
 .btn-primary {
@@ -771,7 +909,8 @@ body::-webkit-scrollbar-thumb {
   border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
-.detail-verdict-pill.benign {
+.detail-verdict-pill.benign,
+.detail-verdict-pill.safe {
   background: rgba(16, 185, 129, 0.15);
   color: var(--accent-safe);
   border: 1px solid rgba(16, 185, 129, 0.3);
@@ -822,11 +961,80 @@ body::-webkit-scrollbar-thumb {
   margin-top: 8px;
 }
 
+.clickable-meta {
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.clickable-meta:hover {
+  border-color: var(--accent-info);
+  background: rgba(30, 41, 59, 0.8);
+}
+
+.info-hint {
+  color: var(--text-muted);
+  font-size: 10px;
+}
+
+.confidence-explain {
+  margin-top: -12px;
+  margin-bottom: 20px;
+  padding: 10px 12px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-sm);
+  animation: slideDown 0.2s ease;
+}
+
+.confidence-explain-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.confidence-explain-text {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+
+.confidence-explain-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-primary);
+  padding: 4px 0;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.confidence-explain-row:first-of-type {
+  border-top: none;
+}
+
 .detail-session-id .detail-meta-value {
   font-size: 11px;
   font-weight: 500;
   color: var(--text-secondary);
   word-break: break-all;
+}
+
+.detail-mark-safe {
+  width: 100%;
+  padding: 8px;
+  margin-top: 14px;
+}
+
+.detail-host-section {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-glass);
+}
+
+.detail-host-note {
+  margin-top: 10px;
+  line-height: 1.5;
 }
 
 /* ── Empty State ── */

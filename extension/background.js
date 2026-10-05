@@ -12,6 +12,29 @@ const BACKEND_URL = 'http://127.0.0.1:8642';
 let backendOnline = false;
 let threatCount = 0;
 
+// ── Alert policy: sensitivity threshold + domain whitelist ──
+// Synced (not local) so they follow the user across devices; kept in memory
+// and refreshed via onChanged so handleVerdict never blocks on a storage read.
+let threshold = 50; // percent — matches the Settings slider's default
+let whitelist = [];
+
+chrome.storage.sync.get(['threshold', 'whitelist'], (data) => {
+  if (data.threshold != null) threshold = data.threshold;
+  if (data.whitelist) whitelist = data.whitelist;
+});
+
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area !== 'sync') return;
+  if (changes.threshold) threshold = changes.threshold.newValue;
+  if (changes.whitelist) whitelist = changes.whitelist.newValue || [];
+});
+
+// Reclassifies a raw malicious_prob against the user's threshold instead of
+// trusting the backend's fixed 0.5 cutoff baked into inference.py.
+function classify(malicious_prob) {
+  return malicious_prob >= threshold / 100 ? 'malicious' : 'benign';
+}
+
 // ── Initialize session manager ──
 const manager = new SessionManager(handleVerdict);
 
@@ -131,14 +154,21 @@ async function handleVerdict(payload) {
     });
     if (!res.ok) throw new Error(`Backend ${res.status}`);
     const result = await res.json();
+    result.verdict = classify(result.malicious_prob);
 
-    storeToSessionLog(payload, result);
+    const isWhitelisted = whitelist.includes(payload.domain);
+    storeToSessionLog(payload, result, isWhitelisted);
 
     if (result.verdict === 'malicious') {
-      threatCount++;
-      updateBadge('threat');
-      showNotification(payload.domain, result);
-      storeToHistory(payload, result);
+      // Always keep the real record, but a whitelisted domain doesn't get
+      // to raise the badge/notification/history alert — the user already
+      // told us this one's a known false positive.
+      if (!isWhitelisted) {
+        threatCount++;
+        updateBadge('threat');
+        showNotification(payload.domain, result);
+        storeToHistory(payload, result, isWhitelisted);
+      }
     } else {
       updateBadge('safe');
     }
@@ -148,6 +178,7 @@ async function handleVerdict(payload) {
       ...result,
       timestamp: Date.now(),
       domain: payload.domain,
+      whitelisted: isWhitelisted,
     });
 
     return result;
@@ -185,7 +216,7 @@ function showNotification(domain, result) {
 }
 
 // ── History storage (malicious verdicts only) ──
-function storeToHistory(payload, result) {
+function storeToHistory(payload, result, whitelisted) {
   chrome.storage.local.get('threatLog', (data) => {
     const log = data.threatLog || [];
     log.unshift({
@@ -197,6 +228,7 @@ function storeToHistory(payload, result) {
       malicious_prob: result.malicious_prob,
       branches: result.branches,
       timestamp: Date.now(),
+      whitelisted: !!whitelisted,
     });
     // Keep last 200 entries
     chrome.storage.local.set({ threatLog: log.slice(0, 200) });
@@ -204,7 +236,7 @@ function storeToHistory(payload, result) {
 }
 
 // ── Full session log (every scanned session, benign + malicious) ──
-function storeToSessionLog(payload, result) {
+function storeToSessionLog(payload, result, whitelisted) {
   chrome.storage.local.get('sessionLog', (data) => {
     const log = data.sessionLog || [];
     log.unshift({
@@ -216,6 +248,7 @@ function storeToSessionLog(payload, result) {
       malicious_prob: result.malicious_prob,
       branches: result.branches,
       timestamp: Date.now(),
+      whitelisted: !!whitelisted,
     });
     // Keep last 300 entries
     chrome.storage.local.set({ sessionLog: log.slice(0, 300) });
