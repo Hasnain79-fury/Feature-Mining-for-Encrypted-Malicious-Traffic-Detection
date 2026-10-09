@@ -296,6 +296,3 @@ The intended workflow includes preprocessing, aligned session ordering across br
 
 Issues and improvements are welcome. When submitting a change, include the steps to reproduce it and the relevant logs or evaluation results. Avoid committing private browsing data, exported threat histories, API secrets, virtual environments, or large model artifacts unless the repository is specifically intended to distribute them.
 
-## License
-
-Add the project's chosen `LICENSE` file before distributing or reusing the code publicly. No specific license is assumed by this README.
